@@ -5,97 +5,23 @@ import lejos.hardware.lcd.LCD;
 import lejos.hardware.motor.RCXMotor;
 import lejos.hardware.port.MotorPort;
 
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
-import java.net.Socket;
-
-import lejos.hardware.motor.RCXMotor;
-
-public class DTestRelayEV3 {
+public class DTestFan {
 	private LongPwmRelay theMotor;
 	
 	public static void main(String[] args) {
-		DTestRelayEV3 obj = new DTestRelayEV3();
+		DTestFan obj = new DTestFan();
 
 		obj.startMenu();				
 	}
 	
 
-	public void test() {
-		int b;
-		int power = 50;
-		
-		// theMotor = new UnregulatedMotor(MotorPort.D);
-		// theMotor.setPower(100);
-
-		theMotor = new LongPwmRelay(MotorPort.D);
-		theMotor.setPower(power);
-		theMotor.flt();
-
-		// theMotor = new NXTRegulatedMotor(MotorPort.D);
-		// theMotor.setSpeed(1000);
-		
-		// theMotor = new EV3LargeRegulatedMotor(MotorPort.D);
-		// theMotor.setSpeed(1000);
-
-		LCD.clear();
-
-		LCD.drawString("Test Moteur D", 1, 1);
-		LCD.drawString("Power = " + power + "  ", 1, 2);
-
-		LCD.drawString("Enter=Power", 0, 3);
-		LCD.drawString("L=backward", 0,4);
-		LCD.drawString("R=back lpwm", 0, 5);
-		LCD.drawString("Dw=Float Up=Stop", 0, 6);
-		LCD.drawString("ESC = Quit", 0, 7);
-		
-		while(Button.getButtons() !=Button.ID_ESCAPE) {
-
-			b = Button.readButtons();
-
-			if (b != 0) {
-				if (b==Button.ID_DOWN)
-					theMotor.flt();
-				else if (b==Button.ID_UP)
-					theMotor.stop();
-				else if (b==Button.ID_LEFT) {
-					theMotor.backward();
-				}
-				else if (b==Button.ID_ENTER) {
-					power += 10;
-					if (power > 100)
-						power = 0;
-
-					LCD.drawString("Power = " + power + "  ", 1, 2);
-
-					theMotor.setPower(power);
-				}
-				else if (b==Button.ID_RIGHT) {
-					theMotor.forward();
-				}
-
-				// wait Button is released
-				while (Button.readButtons() != 0) {
-					Delay.msDelay(10);
-				}
-			}
-		}
-		
-
-		Delay.msDelay(50);
-		
-	}	
-
+	
 	public void testNormalPwm() {
 		int power = 0, b; 
-		RCXMotor motor = new RCXMotor(MotorPort.D);
+		RCXMotor motor = new RCXMotor(MotorPort.C);
 		LCD.clear();
 
-		LCD.drawString("Test Moteur D", 1, 1);
+		LCD.drawString("Test Moteur C", 1, 1);
 		LCD.drawString("Power = " + power + "  ", 1, 2);
 
 		LCD.drawString("Enter=Power PWM", 0, 3);
@@ -136,24 +62,24 @@ public class DTestRelayEV3 {
 	}
 	
 	public void testLongPwm() {
-		int b;
+		int b, mult = 1;
 		int power = 80;	// From 0 (=off) to 100 (Full Power)
 		Thread relayThread;
 		
-		theMotor = new LongPwmRelay(MotorPort.D);
+		theMotor = new LongPwmRelay(MotorPort.C);
 		theMotor.setOff();
-		theMotor.setLongPWM(power, 100 - power);		// Power 80 means 8/100s (=80ms) ON and 2/100s (=20ms) OFF
+		theMotor.setLongPWM(power, 100 - power, 1);		// Power 80 means 8/100s (=80ms) ON and 2/100s (=20ms) OFF
 
 		relayThread = new Thread(theMotor);
 		relayThread.start();
 		
 		LCD.clear();
 
-		LCD.drawString("Test Moteur D", 1, 1);
-		LCD.drawString("LPWM Power = " + power + "  ", 1, 2);
+		LCD.drawString("Test Moteur C", 1, 1);
+		LCD.drawString("Pow=" + power + " mult=" + mult + " ", 1, 2);
 
-		LCD.drawString("Enter=PowerLongPWM", 0, 3);
-		LCD.drawString("L=Run", 0,4);
+		LCD.drawString("L=incr pow R=dec", 0, 4);
+		LCD.drawString("Up=Run", 0,5);
 		LCD.drawString("Dw=Float", 0, 6);
 		LCD.drawString("ESC = Quit", 0, 7);
 		
@@ -164,21 +90,36 @@ public class DTestRelayEV3 {
 			if (b != 0) {
 				if (b==Button.ID_DOWN)
 					theMotor.setOff();
-				else if (b==Button.ID_LEFT) {
+				else if (b==Button.ID_UP) {
 					theMotor.setOn();
 				}
-				else if (b==Button.ID_ENTER) {
+				else if (b==Button.ID_RIGHT) {
 					power += 10;
 					if (power > 100)
+						power = 100;
+
+					LCD.drawString("Pow=" + power + " mult=" + mult + " ", 1, 2);
+					theMotor.setLongPWM(power/10, 10-(power/10), mult);		// Power 80 means 8/100s ON and 2/100s OFF
+				}
+				else if (b==Button.ID_LEFT) {
+					power -= 10;
+					if (power < 0)
 						power = 0;
 
-					LCD.drawString("Power = " + power + "  ", 1, 2);
+					LCD.drawString("Pow=" + power + " mult=" + mult + " ", 1, 2);
+					theMotor.setLongPWM(power/10, 10-(power/10), mult);		// Power 80 means 8/100s ON and 2/100s OFF
+				}
+				else if (b==Button.ID_ENTER) {
+					mult +=1;
+					if (mult > 10)
+						mult = 1;
 
-					theMotor.setLongPWM(power/10, 10-(power/10));		// Power 80 means 8/100s ON and 2/100s OFF
+					LCD.drawString("Pow=" + power + " mult=" + mult + " ", 1, 2);
+					theMotor.setLongPWM(power/10, 10-(power/10), mult);		// Power 80 means 8/100s ON and 2/100s OFF
 				}
 
 				// wait Button is released
-				// while (Button.readButtons() != 0) 	Delay.msDelay(10);
+				while (Button.readButtons() != 0) 	Delay.msDelay(10);
 		
 			}
 

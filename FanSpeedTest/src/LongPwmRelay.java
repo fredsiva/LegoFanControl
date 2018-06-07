@@ -13,11 +13,18 @@ public class LongPwmRelay extends RCXMotor implements Runnable {
 		super(port);
 	}
 	
-	public void setLongPWM(int on, int off) {
-		this.setPower(100);
+	/**
+	 * One 220V cycle at 50hz lasts 20ms
+	 * If we turn motor on during 40ms and stops during 60ms, it will result in 2 cycles ON, and 3 cycles OFF, so 40% power.
+	 * 
+	 * @param on	the time in msec to turn motor on
+	 * @param off	the time in msec to turn motor off
+	 */
+	public void setLongPWM(int on, int off, int mult) {
+		this.setPower(100);	// this is the "short" PWM, or high-frequency, which we do not use.
 		
-		duration_on = on;
-		duration_off = off;
+		duration_on = on*mult;
+		duration_off = off*mult;
 	}
 
 	public void setOn() {
