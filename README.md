@@ -1,5 +1,5 @@
 # LegoFanControl
-Experiment the control of a tri-phase electrical motor using a Triac and "slow-PWM" 
+Experiment the control of a tri-phase electrical motor using a Triac and "slow-PWM", will be used to make a variable speed Fan.
 
 First tests will be done without any clue about the timing of the domestic 50hz input current, results are good enough, demonstrating there is no need to sync with the 50Hz input.
 
