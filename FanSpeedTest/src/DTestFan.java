@@ -5,16 +5,12 @@ import lejos.hardware.lcd.LCD;
 import lejos.hardware.motor.RCXMotor;
 import lejos.hardware.port.MotorPort;
 
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 
-import java.net.Socket;
-
-import lejos.hardware.motor.RCXMotor;
-
+/**
+ * 
+ * Now Stored in GitHub
+ *
+ */
 public class DTestFan {
 	private LongPwmRelay theMotor;
 	
@@ -132,6 +128,8 @@ public class DTestFan {
 
 			Delay.msDelay(10);
 		}
+		
+		motor.close();
 	}
 	
 	public void testLongPwm() {
