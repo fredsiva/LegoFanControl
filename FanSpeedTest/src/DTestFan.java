@@ -15,16 +15,15 @@ import java.net.Socket;
 
 import lejos.hardware.motor.RCXMotor;
 
-public class DTestRelayEV3 {
+public class DTestFan {
 	private LongPwmRelay theMotor;
 	
 	public static void main(String[] args) {
-		DTestRelayEV3 obj = new DTestRelayEV3();
+		DTestFan obj = new DTestFan();
 
 		obj.startMenu();				
 	}
 	
-
 	public void test() {
 		int b;
 		int power = 50;
